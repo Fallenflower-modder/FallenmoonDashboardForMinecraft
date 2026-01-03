@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fallenmoon Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <h1>Fallenmoon Dashboard</h1>
+            <nav class="nav-tabs">
+                <button class="tab-btn active" data-tab="server-details">服务器详情</button>
+                <button class="tab-btn" data-tab="server-config">服务器配置/启动</button>
+                <button class="tab-btn" data-tab="server-components">服务器组件目录</button>
+                <button class="tab-btn" data-tab="crash-analyzer">崩溃分析助手</button>
+                <button class="tab-btn" data-tab="panel-settings">面板设置</button>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="dashboard-content">
+            <!-- Server Details Tab -->
+            <section id="server-details" class="tab-content active">
+                <!-- Top Controls -->
+                <div class="top-controls">
+                    <div class="server-selector">
+                        <select id="server-process-select">
+                            <option value="">选择服务器进程</option>
+                        </select>
+                        <button id="refresh-btn" class="btn btn-secondary">刷新</button>
+                        <button id="connect-btn" class="btn btn-primary">连接</button>
+                    </div>
+                </div>
+
+                <!-- Middle Content -->
+                <div class="middle-content">
+                    <!-- Status Panel -->
+                    <div class="status-panel">
+                        <h3>状态监控</h3>
+                        
+                        <!-- Charts -->
+                        <div class="charts-grid">
+                            <div class="chart-container">
+                                <canvas id="memory-chart"></canvas>
+                                <div class="chart-label">内存占用率</div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="cpu-chart"></canvas>
+                                <div class="chart-label">CPU占用率</div>
+                            </div>
+                        </div>
+
+                        <!-- Status List -->
+                        <div class="status-list">
+                            <div class="status-item">
+                                <span class="status-label">网络 I/O:</span>
+                                <span id="network-io">--</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">CPU频率/占用率:</span>
+                                <span id="cpu-info">--</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">内存大小/占用率:</span>
+                                <span id="memory-info">--</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">TPS:</span>
+                                <span id="tps">--</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">MSPT:</span>
+                                <span id="mspt">--</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">在线人数/最大人数:</span>
+                                <span id="players">--/--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Console Panel -->
+                    <div class="console-panel">
+                        <h3>服务端控制台</h3>
+                        <div id="console-output" class="console-output"></div>
+                        <div class="console-input-area">
+                            <input type="text" id="console-input" placeholder="输入指令...">
+                            <button id="execute-btn" class="btn btn-primary" disabled>执行</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Bar -->
+                <footer class="bottom-bar">
+                    <div class="connection-status" id="connection-status">未连接</div>
+                    <div class="bottom-actions">
+                        <button id="terminate-btn" class="btn btn-danger" disabled>终止</button>
+                    </div>
+                </footer>
+            </section>
+
+            <!-- Server Configuration Tab -->
+            <section id="server-config" class="tab-content">
+                <!-- Top Controls -->
+                <div class="top-controls">
+                    <div class="server-selector">
+                        <select id="config-server-select">
+                            <option value="">选择游戏服务端</option>
+                        </select>
+                        <button id="search-server-btn" class="btn btn-secondary">搜索</button>
+                        <button id="select-server-btn" class="btn btn-primary">选择</button>
+                        <button id="start-server-btn" class="btn btn-success" disabled>启动</button>
+                    </div>
+                </div>
+
+                <!-- Config Tabs -->
+                <div class="config-tabs">
+                    <button class="config-tab-btn active" data-config-tab="server-properties">服务端属性</button>
+                    <button class="config-tab-btn" data-config-tab="server-config">服务端配置</button>
+                    <button class="config-tab-btn" data-config-tab="start-script">服务端启动脚本配置</button>
+                </div>
+
+                <!-- Config Content -->
+                <div class="config-content">
+                    <!-- Server Properties -->
+                    <div id="server-properties" class="config-tab-content active">
+                        <div id="properties-list" class="properties-list"></div>
+                        <button id="save-properties-btn" class="btn btn-primary save-btn">保存</button>
+                    </div>
+
+                    <!-- Server Configuration -->
+                    <div id="server-config" class="config-tab-content">
+                        <div id="config-list" class="config-list"></div>
+                        <button id="save-config-btn" class="btn btn-primary save-btn">保存</button>
+                    </div>
+
+                    <!-- Start Script -->
+                    <div id="start-script" class="config-tab-content">
+                        <textarea id="start-script-content" class="start-script-textarea" placeholder="启动脚本内容..."></textarea>
+                        <button id="save-script-btn" class="btn btn-primary save-btn">保存</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Server Components Tab -->
+            <section id="server-components" class="tab-content">
+                <!-- Top Controls -->
+                <div class="top-controls">
+                    <div class="server-selector">
+                        <select id="components-server-select">
+                            <option value="">选择游戏服务端</option>
+                        </select>
+                        <button id="components-search-btn" class="btn btn-secondary">搜索</button>
+                        <button id="components-select-btn" class="btn btn-primary">选择</button>
+                    </div>
+                </div>
+
+                <!-- Components Tabs -->
+                <div class="components-tabs">
+                    <button class="component-tab-btn" data-component-tab="mods">模组</button>
+                    <button class="component-tab-btn" data-component-tab="plugins">插件</button>
+                    <button class="component-tab-btn" data-component-tab="datapacks">数据包</button>
+                    <button class="component-tab-btn" data-component-tab="resourcepacks">资源包</button>
+                    <button class="component-tab-btn" data-component-tab="schematics">蓝图</button>
+                </div>
+
+                <!-- Components Content -->
+                <div class="components-content">
+                    <div id="mods" class="component-tab-content">
+                        <div class="empty-state">请先选择服务器</div>
+                    </div>
+                    <div id="plugins" class="component-tab-content">
+                        <div class="empty-state">请先选择服务器</div>
+                    </div>
+                    <div id="datapacks" class="component-tab-content">
+                        <div class="empty-state">请先选择服务器</div>
+                    </div>
+                    <div id="resourcepacks" class="component-tab-content">
+                        <div class="empty-state">请先选择服务器</div>
+                    </div>
+                    <div id="schematics" class="component-tab-content">
+                        <div class="empty-state">请先选择服务器</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Crash Analyzer Tab -->
+            <section id="crash-analyzer" class="tab-content">
+                <div class="empty-state">崩溃分析助手功能开发中...</div>
+            </section>
+
+            <!-- Panel Settings Tab -->
+            <section id="panel-settings" class="tab-content">
+                <h2>面板设置</h2>
+                
+                <div class="settings-container">
+                    <!-- Output Rate Setting -->
+                    <div class="setting-group">
+                        <label for="output-rate" class="setting-label">面板最大输出速率（行/秒）</label>
+                        <div class="setting-input-group">
+                            <input type="number" id="output-rate" class="setting-input" min="1" max="1000" value="100">
+                            <span class="setting-unit">行/秒</span>
+                        </div>
+                        <p class="setting-description">控制每秒最大输出的行数，如果每秒输出超过此设定则截断发送直到下一秒</p>
+                    </div>
+
+                    <!-- Background Setting -->
+                    <div class="setting-group">
+                        <label for="background-select" class="setting-label">面板背景</label>
+                        <div class="setting-input-group">
+                            <select id="background-select" class="setting-input">
+                                <option value="default">默认黑色背景</option>
+                                <!-- Background options will be populated via JavaScript -->
+                            </select>
+                            <button id="search-background-btn" class="btn btn-secondary">搜索</button>
+                        </div>
+                        <p class="setting-description">选择客户端目录下的background目录下的任意图片作为面板背景（带有60%强度的毛玻璃效果）</p>
+                    </div>
+
+                    <!-- Background Preview -->
+                    <div class="setting-group">
+                        <label class="setting-label">背景预览</label>
+                        <div id="background-preview" class="background-preview">
+                            <div class="preview-placeholder">选择背景后在此预览</div>
+                        </div>
+                    </div>
+
+                    <!-- Save Button -->
+                    <div class="setting-actions">
+                        <button id="save-settings-btn" class="btn btn-primary">保存并应用</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- WebSocket Connection Status Button -->
+    <button id="ws-status" class="ws-status offline" onclick="showWebSocketConfig()">WebSocket: 离线</button>
+
+    <!-- WebSocket Config Modal -->
+    <div id="ws-config-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideWebSocketConfig()">&times;</span>
+            <h2>WebSocket连接配置</h2>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="ws-ip">面板服务端IP地址:</label>
+                    <input type="text" id="ws-ip" placeholder="请输入IP地址">
+                </div>
+                <div class="form-group">
+                    <label for="ws-port">WebSocket端口:</label>
+                    <input type="number" id="ws-port" placeholder="请输入端口" min="1" max="65535">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="hideWebSocketConfig()" class="btn btn-secondary">取消</button>
+                <button onclick="connectToWebSocketServer()" class="btn btn-primary">连接</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
